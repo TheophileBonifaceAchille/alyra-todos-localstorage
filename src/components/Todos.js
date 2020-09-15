@@ -1,66 +1,62 @@
-import React, { useState } from "react"
-import TodosList from "./TodosList"
-import SelectTodos from "./SelectTodos"
-import AddTodoForm from "./AddTodoForm"
-import { v4 as uuidv4 } from "uuid"
-
-const initialTodos = [
-  {
-    text: "Faires des courses",
-    isCompleted: true,
-    id: "1b688c51-e990-4ce3-95a5-9018cf81d23d",
-  },
-  {
-    text: "Réviser ES6 classes",
-    isCompleted: false,
-    id: "efc6331d-7ca2-49a6-b014-378b8280b33d",
-  },
-  {
-    text: "Aroser les plantes",
-    isCompleted: false,
-    id: "9e60d353-cd72-40bb-97e6-5841e51635c0",
-  },
-]
+import React, { useState, useEffect } from "react";
+import TodosList from "./TodosList";
+import SelectTodos from "./SelectTodos";
+import AddTodoForm from "./AddTodoForm";
+import { v4 as uuidv4 } from "uuid";
 
 const Todos = () => {
-  const [todos, setTodos] = useState(initialTodos)
-  const [filter, setFilter] = useState("all")
+
+  const getLocalStorage = () =>
+  JSON.parse(localStorage.getItem("myTodos")) || [];
+
+  const [todos, setTodos] = useState(getLocalStorage);
+  const [filter, setFilter] = useState("all");
 
   const addTodo = (text) => {
     const newTodo = {
       text,
       isCompleted: false,
       id: uuidv4(),
-    }
-    setTodos([...todos, newTodo])
-  }
+    };
+    setTodos([...todos, newTodo]);
+  };
 
   const deleteTodo = (task) => {
-    setTodos(todos.filter((el) => el.id !== task.id))
-  }
+    setTodos(todos.filter((el) => el.id !== task.id));
+  };
 
   const toggleCompleteTodo = (task) => {
     setTodos(
       todos.map((el) => {
         if (el.id === task.id) {
-          el.isCompleted = !el.isCompleted
+          el.isCompleted = !el.isCompleted;
         }
-        return el
+        return el;
       })
-    )
-  }
+    );
+  };
+
+  useEffect(() => {
+    document.title = todos.length
+      ? `Il vous reste ${todos.length} à accomplir`
+      : "Vous n'avez aucunes tâches";
+  }, [todos.length]);
+
+  useEffect(()=>{
+    localStorage.setItem("myTodos", JSON.stringify(todos))
+  }, [todos])
 
   const filteredTodos = todos.filter((el) => {
     if (filter === "completed") {
-      return el.isCompleted
+      return el.isCompleted;
     }
     if (filter === "notcompleted") {
-      return !el.isCompleted
+      return !el.isCompleted;
     }
-    return true
-  })
+    return true;
+  });
 
-  const completedCount = todos.filter((el) => el.isCompleted).length
+  const completedCount = todos.filter((el) => el.isCompleted).length;
   return (
     <main>
       <h2 className="text-center">
@@ -74,7 +70,7 @@ const Todos = () => {
       />
       <AddTodoForm addTodo={addTodo} setFilter={setFilter} />
     </main>
-  )
-}
+  );
+};
 
-export default Todos
+export default Todos;
